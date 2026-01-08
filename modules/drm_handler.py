@@ -512,37 +512,46 @@ async def drm_handler(bot: Client, m: Message):
                     final_url = url
                     need_referer = False
                     namef = name1
-
                     if "appxsignurl.vercel.app/appx/" in url:
                         try:
+                            # Step 1: Directly use the original URL
                             response = requests.get(url.strip(), timeout=10)
                             data = response.json()
 
+                            # Step 2: Extract actual PDF URL
                             pdf_url = data.get("pdf_url")
                             if pdf_url:
-                                url = pdf_url.strip()
+                                url = pdf_url.strip()   # overwrite with real downloadable link
+                            else:
+                                print("No pdf_url found in response JSON.")
+                                # fallback: keep original URL
+                                # url remains unchanged
 
+                            # Step 3: Extract title if available
                             namef = data.get("title", name1)
+
+                            # Step 4: Mark referer requirement
                             need_referer = True
                         except Exception as e:
                             print(f"Error fetching AppxSignURL JSON: {e}")
                             need_referer = True
                             namef = name1
+                    
 
                     elif "static-db.appx.co.in" in url:
-                        need_referer = True
-                        namef = name1
-
+                           
+                           need_referer = True
+                           namef = name1
                     elif "static-db-v2.appx.co.in" in url:
-                        need_referer = True
-                        namef = name1
+                           
+                           need_referer = True
+                           namef = name1
 
                     elif "static-db-v2.appx.co.in" in url:
                         filename = urlparse(url).path.split("/")[-1]
                         url = f"https://appx-content-v2.classx.co.in/paid_course4/{filename}"
                         need_referer = True
                         namef = name1
-
                     else:
                         if topic == "/yes":
                             namef = f'{v_name}'
@@ -560,48 +569,6 @@ async def drm_handler(bot: Client, m: Message):
                             except:
                                 namef = name1
                         need_referer = True
-
-                    # =========================
-                    # 🔥 ONLY FIX PART STARTS
-                    # =========================
-                    headers = {"User-Agent": "Mozilla/5.0"}
-                    if need_referer:
-                        headers["Referer"] = "https://player.akamai.net.in/"
-
-                    r = requests.get(url, headers=headers, stream=True, timeout=20)
-                    content_type = r.headers.get("Content-Type", "").lower()
-
-                    if "application/pdf" in content_type:
-                        ext = ".pdf"
-                        send_caption = cc1
-                    elif "zip" in content_type:
-                        ext = ".zip"
-                        send_caption = cczip
-                    elif "html" in content_type or "text" in content_type:
-                        ext = ".html"
-                        send_caption = cchtml
-                    else:
-                        ext = ".bin"
-                        send_caption = cc1
-
-                    filename = f"{namef}{ext}"
-
-                    with open(filename, "wb") as f:
-                        for chunk in r.iter_content(1024 * 64):
-                            if chunk:
-                                f.write(chunk)
-
-                    await bot.send_document(
-                        chat_id=channel_id,
-                        document=filename,
-                        caption=send_caption
-                    )
-
-                    os.remove(filename)
-                    count += 1
-
-
-                    
                     if "cwmediabkt99" in url:
                         namef = name1
                         max_retries = 15  # Define the maximum number of retries
@@ -636,34 +603,67 @@ async def drm_handler(bot: Client, m: Message):
                                 continue 
                     else:
                         namef = name1
+                        headers = {
+                            "User-Agent": "Mozilla/5.0",
+                            "Referer": "https://player.akamai.net.in/" if need_referer else ""
+                        }
+
                         try:
-                            # -----------------------------------------
-                            if need_referer:
-                                referer = "https://player.akamai.net.in/"
-                                cmd = f'yt-dlp --add-header "Referer: {referer}" -o "{namef}.pdf" "{url}"'
+                            r = requests.get(url, headers=headers, stream=True, timeout=30)
+                            ctype = (r.headers.get("Content-Type") or "").lower()
+
+                                # ---------- CASE 1: REAL PDF ----------
+                            if "application/pdf" in ctype:
+                                fname = f"{namef}.pdf"
+                                with open(fname, "wb") as f:
+                                    for c in r.iter_content(1024 * 64):
+                                        if c:
+                                            f.write(c)
+
+                                await bot.send_document(channel_id, fname, caption=cc1)
+                                os.remove(fname)
+                                count += 1
+                                continue
+
+                            # ---------- CASE 2: HTML (FAKE PDF) ----------
+                            elif "text/html" in ctype:
+                                fname = f"{namef}.html"
+                                with open(fname, "wb") as f:
+                                    for c in r.iter_content(1024 * 64):
+                                        if c:
+                                            f.write(c)
+
+                                await bot.send_document(channel_id, fname, caption=cchtml)
+                                os.remove(fname)
+                                count += 1
+                                continue
+
+                            # ---------- CASE 3: ZIP ----------
+                            elif "zip" in ctype:
+                                fname = f"{namef}.zip"
+                                with open(fname, "wb") as f:
+                                    for c in r.iter_content(1024 * 64):
+                                        if c:
+                                            f.write(c)
+
+                            await bot.send_document(channel_id, fname, caption=cczip)
+                                os.remove(fname)
+                                count += 1
+                                continue
+
+                            # ---------- UNKNOWN → FALLBACK ----------
                             else:
-                                cmd = f'yt-dlp -o "{namef}.pdf" "{url}"'
+                                raise Exception(f"Unknown content-type: {ctype}")
 
-                            download_cmd = f"{cmd} -R 25 --fragment-retries 25"
+                        except Exception as e:
+                         #   raise Exception(f"AppX PDF/HTML retry failed → {e}")
 
-                            # -----------------------------------------
-                            # DOWNLOAD PDF
-                            # -----------------------------------------
-                            os.system(download_cmd)
 
-                            # -----------------------------------------
-                            # SEND PDF
-                            # -----------------------------------------
-                            copy = await bot.send_document(
-                                chat_id=channel_id,
-                                document=f"{namef}.pdf",
-                                caption=cc1
-                            )
 
-                            count += 1
-                            os.remove(f"{namef}.pdf")
 
-                        except FloodWait as e:
+                        
+
+                        #except FloodWait as e:
                             await m.reply_text(str(e))
                             time.sleep(e.x)
                             continue
@@ -836,6 +836,7 @@ async def drm_handler(bot: Client, m: Message):
                 await bot.send_message(channel_id, f'⚠️**Downloading Failed**⚠️\n**Name** =>> `{str(count).zfill(3)} {name1}`\n**Url** =>> {url}\n\n<blockquote expandable><i><b>Failed Reason: {str(e)}</b></i></blockquote>', disable_web_page_preview=True)
                 count += 1
                 failed_count += 1
+                await asyncio.sleep(5)
                 continue
 
     except Exception as e:
