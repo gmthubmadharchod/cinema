@@ -363,7 +363,7 @@ async def drm_handler(bot: Client, m: Message):
                 url = url.split("bcov_auth")[0]+bcov
 
             #elif "d1d34p8vz63oiq" in url or "sec1.pw.live" in url:
-            elif "megatron-x1-api.vercel.app" in url and "*" in url :
+            elif "https://thin-wynnie-appx-d3d205f7.koyeb.app/play/" in url and "*" in url :
     # Split into base URL and key
              parts = url.split("*", 1)
              if len(parts) == 2:
@@ -410,7 +410,7 @@ async def drm_handler(bot: Client, m: Message):
 
   
                 
-            elif "megatron-x1-api.vercel.app" in url or url.endswith(".m3u8"):
+            elif "https://thin-wynnie-appx-d3d205f7.koyeb.app/play/" in url or url.endswith(".m3u8"):
     # Step 1: Hit the URL (it auto-redirects to real HLS)
              r = requests.get(url, timeout=10, allow_redirects=True)
 
@@ -676,7 +676,7 @@ async def drm_handler(bot: Client, m: Message):
                         await m.reply_text(str(e))
                         time.sleep(e.x)
                         continue    
-                elif "megatron-x1-api.vercel.app" in url:
+                elif "https://thin-wynnie-appx-d3d205f7.koyeb.app/play/" in url:
                     remaining_links = len(links) - count
                     progress = (count / len(links)) * 100
                     Show1 = f"<blockquote>🚀𝐏𝐫𝐨𝐠𝐫𝐞𝐬𝐬 » {progress:.2f}%</blockquote>\n┃\n" \
@@ -709,7 +709,7 @@ async def drm_handler(bot: Client, m: Message):
                 elif (".m3u8" in url and "appx" in url) \
                     or "encrypted.m" in url \
                     or "appxsignurl.vercel.app/appx/" in url \
-                    or ("megatron-x1-api.vercel.app" in url and "*" in url):
+                    or ("https://thin-wynnie-appx-d3d205f7.koyeb.app/play/" in url and "*" in url):
     # handle appx/encrypted/appxsignurl/dragoapi with *key
                     remaining_links = len(links) - count
                     progress = (count / len(links)) * 100
