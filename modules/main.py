@@ -68,7 +68,7 @@ async def start(bot, m: Message):
     caption = f"🌟 Welcome {m.from_user.mention} ! 🌟"
     start_message = await bot.send_photo(
         chat_id=m.chat.id,
-        photo="https://envs.sh/GVI.jpg",
+        photo="https://ar-hosting.pages.dev/1752942111453.jpg",
         caption=caption
     )
 
