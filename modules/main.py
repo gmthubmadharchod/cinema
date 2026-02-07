@@ -144,7 +144,7 @@ async def back_to_main_menu(client, callback_query):
     
     await callback_query.message.edit_media(
       InputMediaPhoto(
-        media="https://envs.sh/GVI.jpg",
+        media="https://ar-hosting.pages.dev/1752942111453.jpg",
         caption=caption
       ),
       reply_markup=keyboard
