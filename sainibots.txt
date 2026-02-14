@@ -1,4 +1,4 @@
-#saini bots
+# saini bots
 async-lru==2.0.2
 tqdm==4.66.1
 certifi==2023.5.7
@@ -23,25 +23,25 @@ motor
 pytz
 aiohttp
 aiofiles
-pytz
 pillow
 m3u8
 umongo==3.1.0
 speedtest-cli
-Flask==1.1.2
-gunicorn==20.1.0
-Jinja2==3.0.3
-werkzeug==2.0.2
-itsdangerous==2.0.1
-ffmpeg
-youtube-dl
+
+# Web
+Flask==2.3.3
+gunicorn==21.2.0
+Jinja2==3.1.2
+werkzeug==2.3.7
+itsdangerous==2.1.2
+
+# Others
 cloudscraper
 cryptography
 PyJWT
 sqlalchemy
 pyopenssl
 wget
-bs4
 beautifulsoup4
 reportlab
 pytube
@@ -50,3 +50,7 @@ google-auth-oauthlib
 google-auth-httplib2
 google-api-python-client
 ffmpeg-python
+
+# 🔥 IMPORTANT FIX (for pkg_resources error)
+setuptools
+wheel
